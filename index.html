@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<meta name="description" content="Visualizing different sorting algorithms, from Bubble Sort to Quick Sort and Slowsort.">
+		<meta name="theme-color" content="#008000"/>
+		<title>Visualize Sort</title>
+		<link rel="manifest" href="manifest.json">
+		<link rel="apple-touch-icon" sizes="250x250" href="icon_apple.png">
+		<meta name="apple-mobile-web-app-title" content="Visualize Sort">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<link rel="shortcut icon" sizes="192x192"  type="image/png" href="icon.png">
+		<link rel="shortcut icon" sizes="32x32"  type="image/png" href="icon32.png">
+		<link rel="stylesheet" type="text/css" href="style.css">
+	</head>
+	<body onclick=""> <!-- steal dropdown focus -->
+		<div class="flexbox">
+			<div class="nav-bar hscroll">
+				&nbsp;&nbsp;<b>Visualize Sort</b>&nbsp;|
+				<div class="nav-container nav-dropdownable">
+					<button class="nav-label">Settings</button>
+					<div class="nav-dropdown">
+						<div class="nav-container">
+							<button class="nav-label" onmousedown="location.reload(true)">Refresh Page</button>
+						</div>
+						<div class="nav-container">
+							<button class="nav-label" onmousedown="resize()">Array Size: <span id="settingArraySize">100</span></button>
+						</div>
+						<div class="nav-container">
+							<button class="nav-label" onmousedown="changeIndent()">Code Indentation: <span id="settingIndent">4</span> Spaces</button>
+						</div>
+						<div class="nav-container nav-dropdownable">
+							<button class="nav-label">Random Seed: <span id="settingSeed">N/A</span></button>
+							<div class="nav-dropdown">
+								<div class="nav-container">
+									<button class="nav-label" onmousedown="changeSeed(false)">Unset</button>
+								</div>
+								<div class="nav-container">
+									<button class="nav-label" onmousedown="changeSeed(true)">Change</button>
+								</div>
+							</div>
+						</div>
+						<div class="nav-container nav-dropdownable">
+							<button class="nav-label">Wave: <span id="settingWave">Triangle</span></button>
+							<div class="nav-dropdown">
+								<div class="nav-container">
+									<button class="nav-label" onmousedown="settingWave.innerText = titleCase(waveType = 'sine')">Sine</button>
+								</div>
+								<div class="nav-container">
+									<button class="nav-label" onmousedown="settingWave.innerText = titleCase(waveType = 'square')">Square</button>
+								</div>
+								<div class="nav-container">
+									<button class="nav-label" onmousedown="settingWave.innerText = titleCase(waveType = 'sawtooth')">Sawtooth</button>
+								</div>
+								<div class="nav-container">
+									<button class="nav-label" onmousedown="settingWave.innerText = titleCase(waveType = 'triangle')">Triangle</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="nav-container nav-dropdownable">
+					<button class="nav-label">Statistics</button>
+					<div class="nav-dropdown">
+						<div class="nav-text nav-seethrough">
+							<span id="statTotalReadCount">0</span> Read(s) from Array
+						</div>
+						<div class="nav-text nav-seethrough">
+							<span id="statTotalWriteCount">0</span> Write(s) to Array
+						</div>
+						<div class="nav-text nav-seethrough">
+							<span id="statReadCount">0</span> Read(s) from Main Array
+						</div>
+						<div class="nav-text nav-seethrough">
+							<span id="statWriteCount">0</span> Write(s) to Main Array
+						</div>
+						<div class="nav-text nav-seethrough">
+							<span id="statArrayReadCount">0</span> Read(s) from Auxiliary Array
+						</div>
+						<div class="nav-text nav-seethrough">
+							<span id="statArrayWriteCount">0</span> Write(s) to Auxiliary Array
+						</div>
+						<div class="nav-text nav-seethrough">
+							<span id="statCompareCount">0</span> Comparison(s)
+						</div>
+						<div class="nav-text nav-seethrough">
+							<span id="statSwapCount">0</span> Swap(s)
+						</div>
+					</div>
+				</div>
+				<div class="nav-container nav-dropdownable">
+					<button class="nav-label">Variables</button>
+					<div class="nav-dropdown" id="tabvariables">
+					</div>
+				</div>
+				|
+				<div class="nav-container nav-dropdownable">
+					<button class="nav-label">Shuffle</button>
+					<div class="nav-dropdown">
+						<div class="nav-container">
+							<button class="nav-label" onmousedown="shuffle('random')">Random</button>
+						</div>
+						<div class="nav-container">
+							<button class="nav-label" onmousedown="shuffle('dupes')">With Duplicates</button>
+						</div>
+						<div class="nav-container">
+							<button class="nav-label" onmousedown="shuffle('reversed')">Reversed</button>
+						</div>
+						<div class="nav-container">
+							<button class="nav-label" onmousedown="shuffle('k-sorted')">k-Sorted</button>
+						</div>
+						<div class="nav-container">
+							<button class="nav-label" onmousedown="shuffle('ordered')">Ordered</button>
+						</div>
+					</div>
+				</div>
+				|
+				<div class="nav-container nav-dropdownable">
+					<button class="nav-label">Bubble</button>
+					<div class="nav-dropdown">
+						<div class="nav-container">
+							<button class="nav-label" onmousedown="runalgo('bubble0')">Bubble Sort (Standard)</button>
+						</div>
+						<div class="nav-container">
+							<button class="nav-label" onmousedown="runalgo('bubble1')">Bubble Sort (Optimized)</button>
+						</div>
+						<div class="nav-container">
+							<button class="nav-label" onmousedown="runalgo('cocktail0')">Cocktail Shaker Sort (Standard)</button>
+						</div>
+						<div class="nav-container">
+							<button class="nav-label" onmousedown="runalgo('cocktail1')">Cocktail Shaker Sort (Optimized)</button>
+						</div>
+					</div>
+				</div>
+				<div class="nav-container nav-dropdownable">
+					<button class="nav-label">Selection</button>
+					<div class="nav-dropdown">
+						<div class="nav-container">
+							<button class="nav-label" onmousedown="runalgo('selection0')">Selection Sort (Standard)</button>
+						</div>
+						<div class="nav-container">
+							<button class="nav-label" onmousedown="runalgo('selection1')">Selection Sort (Less Array Read)</button>
+						</div>
+					</div>
+				</div>
+				<div class="nav-container nav-dropdownable">
+					<button class="nav-label">Insertion</button>
+					<div class="nav-dropdown">
+						<div class="nav-container">
+							<button class="nav-label" onmousedown="runalgo('insertion0')">Insertion Sort (Standard)</button>
+						</div>
+					</div>
+				</div>
+				<div class="nav-container nav-dropdownable">
+					<button class="nav-label">Merge</button>
+					<div class="nav-dropdown">
+						<div class="nav-container">
+							<button class="nav-label" onmousedown="runalgo('merge0')">Merge Sort (Standard)</button>
+						</div>
+						<div class="nav-container">
+							<button class="nav-label" onmousedown="runalgo('merge1')">Merge Sort (Bottom-up)</button>
+						</div>
+					</div>
+				</div>
+				<div class="nav-container nav-dropdownable">
+					<button class="nav-label">Quick</button>
+					<div class="nav-dropdown">
+						<div class="nav-container">
+							<button class="nav-label" onmousedown="runalgo('quickH')">Quick Sort (Hoare partition)</button>
+						</div>
+						<div class="nav-container">
+							<button class="nav-label" onmousedown="runalgo('quickL')">Quick Sort (Lomuto partition)</button>
+						</div>
+						<div class="nav-container">
+							<button class="nav-label" onmousedown="runalgo('quickL3')">Quick Sort (Lomuto, Median of 3)</button>
+						</div>
+					</div>
+				</div>
+				<div class="nav-container nav-dropdownable">
+					<button class="nav-label">Heap</button>
+					<div class="nav-dropdown">
+						<div class="nav-container">
+							<button class="nav-label" onmousedown="runalgo('heap0')">Max Heap Sort</button>
+						</div>
+					</div>
+				</div>
+				<div class="nav-container nav-dropdownable">
+					<button class="nav-label">Slow</button>
+					<div class="nav-dropdown">
+						<div class="nav-container">
+							<button class="nav-label" onmousedown="runalgo('bogo0')">Bogosort</button>
+						</div>
+						<div class="nav-container">
+							<button class="nav-label" onmousedown="runalgo('bogo1')">Bogosort (Bounded)</button>
+						</div>
+						<div class="nav-container">
+							<button class="nav-label" onmousedown="runalgo('bozo0')">Bozosort</button>
+						</div>
+						<div class="nav-container">
+							<button class="nav-label" onmousedown="runalgo('stooge0')">Stooge Sort</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="main">
+				<div id="arraychart"></div>
+				<div id="information">
+					<div id="description">
+					</div>
+					<div id="sourcecodediv">		
+						<table>
+							<thead>
+								<tr>
+									<td colspan="2">Implementation in
+									<select id="selectlanguage" onchange="changeProgrammingLanguage(this.value)">
+									</select>
+									: <button onclick="copy()">Copy</button></td>
+								</tr>
+							</thead>
+							<tbody id="codearea"></tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<form class="footer hscroll" autocomplete="off" onsubmit="return false;">
+				<input type="checkbox" name="mute" onclick="setMute(!this.checked)" value="Sound" checked>|
+				<input type="radio" name="play" onclick="changePlayMode(this.value)" value="Pause">
+				<input type="radio" name="play" onclick="changePlayMode(this.value)" value="Step">
+				<input type="radio" name="play" onclick="changePlayMode(this.value)" value="Slow">
+				<input type="radio" name="play" onclick="changePlayMode(this.value)" value="Medium" checked>
+				<input type="radio" name="play" onclick="changePlayMode(this.value)" value="Fast">
+				<input type="radio" name="play" onclick="changePlayMode(this.value)" value="Ultra">|
+				<input type="radio" name="color" onclick="changeColorMode(this.value)" value="Rainbow" checked>
+				<input type="radio" name="color" onclick="changeColorMode(this.value)" value="Marker">|
+				<div>Total Array Read: <span id="readCount">0</span></div>
+				<div>Total Array Write: <span id="writeCount">0</span></div>
+				<div>Comparison: <span id="compareCount">0</span></div>
+			</form>
+		</div>
+		<script src="random.js"></script>
+		<script src="utilities.js"></script>
+		<script src="polyfill.js"></script>
+		<script src="code.js"></script>
+		<script src="code_processor.js"></script>
+		<script src="prolang.js"></script>
+		<script src="main.js"></script>
+	</body>
+</html>

@@ -1,0 +1,298 @@
+
+* {
+    box-sizing: border-box !important; /* important such that it's not affected by unset*/
+}
+
+html, body, .flexbox {
+    height: 100%;
+    width: 100%;
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+    position: fixed;
+}
+
+body {
+    background-color: black;
+    color: white;
+    font-family: sans-serif;
+    margin: 0;
+    overflow: hidden;
+    /* position: relative; */
+}
+
+.flexbox {
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* navigation bar */
+.nav-label, .nav-text {
+    all: unset;
+    width: 100%;
+    display: inline-block;
+    white-space: nowrap;
+}
+.nav-text {
+    padding: 8px;
+    cursor: default;
+}
+.nav-label {
+    padding: 8px 28px 8px 8px;
+}
+.nav-bar {
+    z-index: 9999;
+    flex: 0 1 auto;
+    background-color: #333333;
+    min-height: 35px;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+.nav-bar {
+    white-space: nowrap;
+}
+.nav-bar > div {
+    white-space: initial;
+}
+.nav-bar > div {
+    position: relative;
+    max-height: 100%;
+}
+.nav-bar > div > .nav-label {
+    display: block;
+    padding: 8px;
+}
+.nav-bar > div {
+    display: inline-block;
+}
+.nav-bar > div:hover {
+    background-color: #008000;
+    cursor: pointer;
+}
+div > .nav-dropdown {
+    display: none;
+    position: absolute;
+    border: 2px solid gray;
+}
+div:hover > .nav-dropdown {
+    display: block;
+}
+.nav-dropdown > div > .nav-label {
+    background-color: #666666;
+}
+.nav-dropdown > .nav-text.nav-seethrough, .nav-dropdown > div > .nav-label.nav-seethrough {
+    background-color: rgba(102, 102, 102, 0.75);
+    /* background opacity: 75% */
+}
+.nav-dropdown > div:hover > .nav-label {
+    background-color: #00c000;
+}
+.nav-container:not(.nav-dropdownable):active, .nav-container:not(.nav-dropdownable):active ~ .nav-container { /* lost active hack*/
+    display: none;
+}
+.nav-dropdown > div {
+    position: relative;
+}
+.nav-dropdown > div > .nav-dropdown {
+    top: 0;
+    left: 100%;
+    margin-top: -2px;
+}
+.nav-dropdown > div.nav-dropdownable > .nav-label::after {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    content: "▾";
+    padding: 8px;
+    float: right;
+}
+
+/* main */
+.main {
+    background-color: black;
+    flex: 1 1 auto;
+    display: flex;
+    height: 100%;
+    max-height: calc(100vh - 70px);
+}
+#arraychart {
+    flex: 1 1 0;
+    /* flex-basis: 0 for equal size*/
+    display: flex;
+    align-items: flex-end;
+    /* Use to fix versions before Chrome 72 taking 100vw as 100% */
+    height: 100%;
+    touch-action: none;
+}
+#arraychart .bar {
+    flex: 1 1 0;
+    /* flex-basis: 0 for equal size*/
+}
+#information {
+    flex: 0 1 400px;
+    position: relative;
+}
+#information {
+    display: flex;
+    flex-flow: column;
+}
+#information > div {
+    overflow-x: auto;
+    overflow-y: auto;
+    border: 1px solid gray;
+    touch-action: pan-y;
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+}
+#information > #description {
+    flex: 1 1 0;
+    padding: 8px;
+    border-radius: 8px;
+    /* flex-basis: 0 for equal size*/
+    background-color: #333333;
+    border-bottom: 0;
+}
+#information > #sourcecodediv {
+    flex: 2 1 0;
+    /* flex-basis: 0 for equal size*/
+}
+#sourcecodediv button {
+    all: unset;
+    background: #333333;
+    border: 1px solid #666666;
+    border-radius: 5px;
+    padding: 5px;
+}
+#sourcecodediv button:hover {
+    background: green;
+}
+#sourcecodediv select {
+    font-size: inherit;
+    color: inherit;
+    background: #333333;
+    border: 1px solid #666666;
+    border-radius: 5px;
+    padding: 5px;
+}
+#sourcecodediv option {
+    padding: 5px;
+}
+#sourcecodediv table {
+    width: 100%;
+}
+#codearea {
+    font-family: 'Consolas', 'Courier New', Courier, monospace;
+}
+#codearea td {
+    background-color: #333333;
+    padding: 3px;
+}
+#codearea th {
+    text-align: right;
+    vertical-align: top;
+    background-color: #666666;
+    padding: 3px;
+}
+#codearea tr.active > * {
+    background-color: #666600;
+}
+#codearea th::before {
+    content: attr(data-line);
+}
+#codearea td > div::after {
+    content: "​";
+    display: inline-block;
+    visibility: hidden;
+}
+#codearea td > div {
+    word-break: break-all;
+}
+
+/* footer */
+.footer {
+    z-index: 9999;
+    flex: 0 1 auto;
+    background-color: #333333;
+    min-height: 35px;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+.footer, .footer > * {
+    white-space: nowrap;
+}
+.footer > * {
+    padding: 8px !important;
+}
+.footer input {
+    all: unset;
+    display: inline-block;
+}
+.footer input::after {
+    content: attr(value);
+}
+.footer input:hover {
+    cursor: pointer;
+}
+.footer input:checked {
+    background-color: #008000;
+}
+
+/* hacks */
+.hscroll {
+    left: calc(var(--offset) * 1px);
+    touch-action: pan-x;
+}
+.hscroll::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: calc(var(--offset) * -1px);
+    background-color: #333333;
+    min-width: 100%;
+    height: 100%;
+    top: 0;
+    /* Fix Chrome 49 */
+}
+
+@media only screen and (max-width: 800px), only screen and (max-aspect-ratio: 5/4) { /* vertical device */
+    .main {
+        flex-flow: column;
+    }
+    #arraychart {				
+        flex: 1 1 0;
+        /* flex-basis: 0 for equal size*/
+        height: 100%;
+        max-height: calc(100% - 40vh);
+    }
+    #information {
+        flex: 0 1 40vh;
+        max-height: 40vh;
+        /* Recent browser fix to prevent code overflow*/
+        flex-flow: row;
+    }
+    #information > #description {
+        border-bottom: 1px solid gray;
+        border-right: 0;
+    }
+}
+
+@media only screen and (max-width: 600px) { /* worst device */
+    .main {
+        flex-flow: column;
+    }
+    #arraychart {				
+        flex: 1 1 0;
+        /* flex-basis: 0 for equal size*/
+        max-height: calc(100% - 40vh);
+    }
+    #information {
+        flex: 0 1 40vh;
+        max-height: 40vh;
+        /* Recent browser fix to prevent code overflow*/
+        flex-flow: column;
+    }
+}

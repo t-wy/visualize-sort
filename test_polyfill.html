@@ -1,0 +1,142 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Testing</title>
+        <style>
+            table {
+                border-collapse: collapse;
+            }
+            th, td {
+                border: 1px solid black;
+                padding: 4px;
+            }
+            td.null {
+                background-color: gray;
+            }
+            td.true {
+                background-color: lime;
+            }
+            td.false {
+                background-color: pink;
+            }
+        </style>
+	</head>
+	<body>
+        <table>
+            <thead>
+                <tr>
+                    <th>Function</th>
+                    <th>Supported?</th>
+                    <th>Polyfill?</th>
+                </tr>
+            </thead>
+            <tbody id="result"></tbody>
+        </table>
+		<script>
+            var _try = function (x) {
+                return function() {
+                    try {
+                        eval(x);
+                        return true;
+                    } catch (ex) {
+                        return false;
+                    }
+                }
+            }
+            var _test = function (x) {
+                return function() {
+                   return x;
+                }
+            }
+            var testcases = [
+                {
+                    "name": "String.prototype.trimStart",
+                    "test": function() { return !!String.prototype.trimStart;},
+                    "polyfill": function() { return !!String.prototype.trimLeft;}
+                },
+                {
+                    "name": "String.prototype.replaceAll",
+                    "test": _test(!!String.prototype.replaceAll),
+                    "polyfill": _test(!!String.prototype.replace)
+                },
+                {
+                    "name": "ResizeObserver",
+                    "test": _test(typeof(ResizeObserver) !== "undefined"),
+                    "polyfill": _test(!!window.getComputedStyle)
+                },
+                {
+                    "name": "CSS Custom properties",
+                    "test": function() {
+                        var temp = document.createElement("a");
+                        temp.style.setProperty("--offset", "0");
+                        return temp.style.getPropertyValue("--offset") === "0";
+                    },
+                    "polyfill": function() {return true;}
+                },
+                {
+                    "name": "navigator.clipboard",
+                    "test": _test(!!navigator.clipboard),
+                    "polyfill": function() {return true;}
+                },
+                {
+                    "name": "Array.prototype.includes",
+                    "test": _test(!!Array.prototype.includes),
+                    "polyfill": _test(!!(String.prototype.indexOf && String.prototype.slice))
+                },
+                {
+                    "name": "[...[1]]",
+                    "test": _try("[...[1]]"),
+                    "polyfill": function() {return null;}
+                },
+                {
+                    "name": "function (...a) {}",
+                    "test": _try("{var x = function(...a){}}"),
+                    "polyfill": function() {return null;}
+                },
+                {
+                    "name": "let",
+                    "test": _try("let y = 1"),
+                    "polyfill": _try("var y = 1"),
+                },
+                {
+                    "name": "**",
+                    "test": _try("2 ** 3"),
+                    "polyfill": _try("Math.pow(2, 3)"),
+                },
+                {
+                    "name": "Arrow function expressions",
+                    "test": _try("() => 1"),
+                    "polyfill": _try("(function(){return 1})"),
+                },
+                {
+                    "name": "NodeList.prototype.forEach",
+                    "test": _test(!!NodeList.prototype.forEach),
+                    "polyfill": _test(!!(Array.prototype.forEach && Array.from))
+                },
+                {
+                    "name": "Array.from",
+                    "test": _test(!!Array.from),
+                    "polyfill": function() {return null;}
+                },
+            ];
+            testcases.forEach(function (test) {
+                var tr = document.createElement("tr");
+                var td = document.createElement("td");
+                td.innerHTML = test.name;
+                tr.appendChild(td);
+                td = document.createElement("td");
+                var testresult = test.test();
+                td.innerHTML = testresult===null?"N/A":testresult?"Yes":"No";
+                td.className = testresult;
+                tr.appendChild(td);
+                td = document.createElement("td");
+                var testresult = test.polyfill();
+                td.innerHTML = testresult===null?"N/A":testresult?"Yes":"No";
+                td.className = testresult;
+                tr.appendChild(td);
+                result.appendChild(tr);
+            })
+		</script>
+	</body>
+</html>

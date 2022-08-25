@@ -1,0 +1,18 @@
+{
+    "short_name": "Visualize Sort",
+    "name": "Visualize Sort",
+    "icons": [{
+        "src":"icon192.png",
+        "sizes": "192×192",
+        "type": "image/png",
+        "purpose": "maskable"
+    }, {
+        "src":"icon512.png",
+        "sizes": "512x512",
+        "type": "image/png"
+    }],
+    "start_url": "index.html",
+    "background_color": "#000",
+    "theme_color": "#008000",
+    "display": "standalone"
+}

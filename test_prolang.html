@@ -1,0 +1,333 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Testing</title>
+		<style>
+            #keys > div {
+                border: 1px solid black;
+            }
+            code {
+                display: block;
+                background-color: #333333;
+                border-radius: 5px;
+                border: 1px solid black;
+                padding: 5px;
+                color: white;
+                word-break: break-all;
+            }
+			input {
+				all: unset;
+				display: inline-block;
+                padding: 5px;
+                border: 1px solid black;
+			}
+			input::after {
+				content: attr(data-label);
+			}
+			input:hover {
+				cursor: pointer;
+			}
+			input:checked {
+				background-color: lime;
+			}
+        </style>
+		<script src="prolang.js"></script>
+	</head>
+	<body>
+        <div id="buttons">
+
+        </div>
+		<div id="keys">
+		</div>		
+		<script>
+            var testcases = [
+                {"name": "Expressions", "cases": [
+                    {"label": "0", "test": (lang) => lang.const(0).exp},
+                    {"label": "true", "test": (lang) => lang.const(true).exp},
+                    {"label": "false", "test": (lang) => lang.const(false).exp},
+                    {"label": "null", "test": (lang) => lang.const(null).exp},
+                    {"label": "3 + 4 × 5 - 7 // 2", "test": function (lang) {
+                        var temp, temp2;
+                        temp = lang.operator2("*", lang.const(4), lang.const(5));
+                        temp = lang.operator2("+", lang.const(3), temp);
+                        temp2 = lang.operator2("//", lang.const(7), lang.const(2));
+                        temp = lang.operator2("-", temp, temp2);
+                        return temp.exp;
+                    }},
+                    {"label": "(3 + 4) × (5 - 7) // 2", "test": function (lang) {
+                        var temp, temp2;
+                        temp = lang.operator2("+", lang.const(3), lang.const(4));
+                        temp2 = lang.operator2("-", lang.const(5), lang.const(7));
+                        temp = lang.operator2("*", temp, temp2);
+                        temp = lang.operator2("//", temp, lang.const(2));
+                        return temp.exp;
+                    }},
+                    {"label": "(-2)⁴", "test": function (lang) {
+                        var temp;
+                        temp = lang.operator1("-", lang.const(2));
+                        temp = lang.operator2("**", temp, lang.const(4));
+                        return temp.exp;
+                    }},
+                    {"label": "-2⁴", "test": function (lang) {
+                        var temp;
+                        temp = lang.operator2("**", lang.const(2), lang.const(4));
+                        temp = lang.operator1("-", temp);
+                        return temp.exp;
+                    }},
+                    {"label": "2<sup>3+4</sup>", "test": function (lang) {
+                        var temp;
+                        temp = lang.operator2("+", lang.const(3), lang.const(4));
+                        temp = lang.operator2("**", lang.const(2), temp);
+                        return temp.exp;
+                    }},
+                    {"label": "3 × 2<sup>3²</sup>", "test": function (lang) {
+                        var temp;
+                        temp = lang.operator2("**", lang.const(3), lang.const(2));
+                        temp = lang.operator2("**", lang.const(2), temp);
+                        temp = lang.operator2("*", lang.const(3), temp);
+                        return temp.exp;
+                    }},
+                    {"label": "3 × (2<sup>3</sup>)<sup>²</sup>", "test": function (lang) {
+                        var temp;
+                        temp = lang.operator2("**", lang.const(2), lang.const(3));
+                        temp = lang.operator2("**", temp, lang.const(2));
+                        temp = lang.operator2("*", lang.const(3), temp);
+                        return temp.exp;
+                    }},
+                    {"label": "n << 1", "test": function (lang) {
+                        var temp;
+                        temp = lang.operator2("<<", lang.varname("n"), lang.const(1));
+                        return temp.exp;
+                    }},
+                    {"label": "n >> 1", "test": function (lang) {
+                        var temp;
+                        temp = lang.operator2(">>", lang.varname("n"), lang.const(1));
+                        return temp.exp;
+                    }},
+                    {"label": "(n << 1) >> 1", "test": function (lang) {
+                        var temp;
+                        temp = lang.operator2("<<", lang.varname("n"), lang.const(1));
+                        temp = lang.operator2(">>", temp, lang.const(1));
+                        return temp.exp;
+                    }},
+                    {"label": "1 << (23 - n)", "test": function (lang) {
+                        var temp;
+                        temp = lang.operator2("-", lang.const(23), lang.varname("n"));
+                        temp = lang.operator2("<<", lang.const(1), temp);
+                        return temp.exp;
+                    }},
+                    {"label": "(1 << 23) - n", "test": function (lang) {
+                        var temp;
+                        temp = lang.operator2("<<", lang.const(1), lang.const(23));
+                        temp = lang.operator2("-", temp, lang.varname("n"));
+                        return temp.exp;
+                    }},
+                    {"label": "12345 >> (23 - n)", "test": function (lang) {
+                        var temp;
+                        temp = lang.operator2("-", lang.const(23), lang.varname("n"));
+                        temp = lang.operator2(">>", lang.const(12345), temp);
+                        return temp.exp;
+                    }},
+                    {"label": "2 xor 3", "test": function (lang) {
+                        var temp;
+                        temp = lang.operator2("^", lang.const(2), lang.const(3));
+                        return temp.exp;
+                    }},
+                    {"label": "f1(a[(length of a) - f2(5)], true)", "test": function (lang) {
+                        var temp, temp2;
+                        temp = lang.getlength(lang.varname("a"));
+                        temp2 = lang.func("f2", [lang.const(5)]);
+                        temp = lang.operator2("-", temp, temp2);
+                        temp = lang.subscript(lang.varname("a"), temp);
+                        temp = lang.func("f1", [temp, lang.const(true)]);
+                        return temp.exp;
+                    }},
+                    {"label": "Random between 1 and n - i + 1", "test": function (lang) {
+                        var temp;
+                        temp = lang.operator2("-", lang.varname("n"), lang.varname("i"));
+                        temp = lang.operator2("+", temp, lang.const(1));
+                        temp = lang.random(lang.const(1), temp);
+                        return temp.exp;
+                    }},
+                ]},
+                {"name": "Statements", "cases": [
+                    {"label": "a = 7", "test": function (lang) {
+                        var temp;
+                        temp = lang.assign(0, lang.varname("a"), lang.const(7));
+                        return temp.join("<br>");
+                    }},
+                    {"label": "fail", "test": function (lang) {
+                        var temp;
+                        temp = lang.fail(0);
+                        return temp.join("<br>");
+                    }},
+                    {"label": "return", "test": function (lang) {
+                        var temp;
+                        temp = lang.return0(0);
+                        return temp.join("<br>");
+                    }},
+                    {"label": "return 3", "test": function (lang) {
+                        var temp;
+                        temp = lang.return1(0, lang.const(3), "a", []);
+                        return temp.join("<br>");
+                    }},
+                    {"label": "continue", "test": function (lang) {
+                        var temp;
+                        temp = lang.continue(0);
+                        return temp.join("<br>");
+                    }},
+                    {"label": "break", "test": function (lang) {
+                        var temp;
+                        temp = lang.break(0);
+                        return temp.join("<br>");
+                    }},
+                    {"label": "swap a[1], b[2]", "test": function (lang) {
+                        var temp;
+                        temp = lang.swap(0, lang.subscript(lang.varname("a"), lang.const(1)), lang.subscript(lang.varname("b"), lang.const(2)));
+                        return temp.join("<br>");
+                    }},
+                    {"label": "a *= a + 3", "test": function (lang) {
+                        var temp;
+                        temp = lang.opassign2(0, "*=", lang.varname("a"), lang.operator2("+", lang.varname("a"), lang.const(3)));
+                        return temp.join("<br>");
+                    }},
+                    {"label": "a[3]++", "test": function (lang) {
+                        var temp;
+                        temp = lang.opassign1(0, "++", lang.subscript(lang.varname("a"), lang.const(3)));
+                        return temp.join("<br>");
+                    }},
+                    {"label": "a = Empty array of shape [] (just 0)", "test": function (lang) {
+                        var temp;
+                        temp = lang.init(0, lang.varname("a"), []);
+                        return temp.join("<br>");
+                    }},
+                    {"label": "a = Empty array of shape [2, 3, 4]", "test": function (lang) {
+                        var temp;
+                        temp = lang.init(0, lang.varname("a"), [lang.const(2), lang.const(3), lang.const(4)]);
+                        return temp.join("<br>");
+                    }},
+                    {"label": "a = Empty array of shape [b + 2, b + 2, b + 2]", "test": function (lang) {
+                        var temp;
+                        temp = lang.operator2("+", lang.varname("b"), lang.const(2));
+                        temp = lang.init(0, lang.varname("a"), [temp, temp, temp]);
+                        return temp.join("<br>");
+                    }},
+                    {"label": "a = Empty array of shape [b², b², b²]", "test": function (lang) {
+                        var temp;
+                        temp = lang.operator2("**", lang.varname("b"), lang.const(2));
+                        temp = lang.init(0, lang.varname("a"), [temp, temp, temp]);
+                        return temp.join("<br>");
+                    }},
+                ]},
+                {"name": "Sub-blocks", "cases": [
+                    {"label": "while 1 + 1 = 2 ( a += 1 )", "test": function (lang) {
+                        var temp1, temp2, temp3;
+                        temp1 = lang.while_start(0, lang.operator2("==", lang.operator2("+", lang.const(1), lang.const(1)), lang.const(2)));
+                        temp2 = lang.opassign2(1, "+=", lang.varname("a"), lang.const(1));
+                        temp3 = lang.while_end(0);
+                        return [...temp1, ...temp2, ...temp3].join("<br>");
+                    }},
+                    {"label": "do ( a += 1 ) while 1 + 1 = 2", "test": function (lang) {
+                        var temp1, temp2, temp3;
+                        temp1 = lang.do_while_start(0);
+                        temp2 = lang.opassign2(1, "+=", lang.varname("a"), lang.const(1));
+                        temp3 = lang.do_while_end(0, lang.operator2("==", lang.operator2("+", lang.const(1), lang.const(1)), lang.const(2)));
+                        return [...temp1, ...temp2, ...temp3].join("<br>");
+                    }},
+                    {"label": "repeat ( a += 1 ) until 1 + 1 = 2", "test": function (lang) {
+                        var temp1, temp2, temp3;
+                        temp1 = lang.repeat_until_start(0);
+                        temp2 = lang.opassign2(1, "+=", lang.varname("a"), lang.const(1));
+                        temp3 = lang.repeat_until_end(0, lang.operator2("==", lang.operator2("+", lang.const(1), lang.const(1)), lang.const(2)));
+                        return [...temp1, ...temp2, ...temp3].join("<br>");
+                    }},
+                    {"label": "for x in [1, 10] ( a += 1 )", "test": function (lang) {
+                        var temp1, temp2, temp3;
+                        temp1 = lang.for_start(0, lang.varname("x"), lang.const(1), lang.const(10), lang.const(1), "up", true);
+                        temp2 = lang.opassign2(1, "+=", lang.varname("a"), lang.const(1));
+                        temp3 = lang.for_end(0, lang.varname("x"));
+                        return [...temp1, ...temp2, ...temp3].join("<br>");
+                    }},
+                    {"label": "for x in [1, 10, 2) ( a += 1 )", "test": function (lang) {
+                        var temp1, temp2, temp3;
+                        temp1 = lang.for_start(0, lang.varname("x"), lang.const(1), lang.const(10), lang.const(2), "up", false);
+                        temp2 = lang.opassign2(1, "+=", lang.varname("a"), lang.const(1));
+                        temp3 = lang.for_end(0, lang.varname("x"));
+                        return [...temp1, ...temp2, ...temp3].join("<br>");
+                    }},
+                    {"label": "for x in [100, 50, -4) ( a += 1 )", "test": function (lang) {
+                        var temp1, temp2, temp3;
+                        temp1 = lang.for_start(0, lang.varname("x"), lang.const(100), lang.const(50), lang.const(-4), "down", false);
+                        temp2 = lang.opassign2(1, "+=", lang.varname("a"), lang.const(1));
+                        temp3 = lang.for_end(0, lang.varname("x"));
+                        return [...temp1, ...temp2, ...temp3].join("<br>");
+                    }},
+                    {"label": "if (a = 1) {a += 1} else if (a = 2) {a -= 2} else {a *= 3}", "test": function (lang) {
+                        var temp1, temp2, temp3, temp4, temp5, temp6, temp7;
+                        temp1 = lang.if_start(0, lang.operator2("==", lang.varname("a"), lang.const(1)));
+                        temp2 = lang.opassign2(1, "+=", lang.varname("a"), lang.const(1));
+                        temp3 = lang.if_elseif(0, lang.operator2("==", lang.varname("a"), lang.const(2)));
+                        temp4 = lang.opassign2(1, "-=", lang.varname("a"), lang.const(2));
+                        temp5 = lang.if_else(0);
+                        temp6 = lang.opassign2(1, "*=", lang.varname("a"), lang.const(3));
+                        temp7 = lang.if_end(0);
+                        return [...temp1, ...temp2, ...temp3, ...temp4, ...temp5, ...temp6, ...temp7].join("<br>");
+                    }},
+                    {"label": "Wrapper", "test": function (lang) {
+                        var fake_algo = [];
+                        return [...lang.code_start(fake_algo), ...lang.code_end(fake_algo)].join("<br>");
+                    }},
+                ]},
+            ]
+            var first = true;
+            Object.keys(languages).forEach(lang => {
+                var div = document.createElement("div");
+                var label = document.createElement("h3");
+                var prolang = languages[lang];
+                label.innerText = prolang.name;
+                div.appendChild(label);
+                // Test Cases
+                testcases.forEach(tc => {
+                    var caselabel = document.createElement("h4");
+                    caselabel.innerText = tc.name;
+                    div.appendChild(caselabel);
+                    tc.cases.forEach(c => {
+                        var labelblock = document.createElement("span");
+                        labelblock.innerHTML = c.label;
+                        div.appendChild(labelblock);
+                        div.appendChild(document.createTextNode(": "));
+                        div.appendChild(document.createElement("br"));
+                        var codeblock = document.createElement("code");
+                        codeblock.innerHTML = c.test(prolang).replace(/(^|<br>) +/g, x => x.slice(0, x.indexOf(" ")) + "&nbsp;".repeat(x.length - x.indexOf(" ")));
+                        div.appendChild(codeblock);
+                        div.appendChild(document.createElement("br"));
+                    });
+                })
+
+                div.className = lang;
+                if (!first) {
+                    div.style.display = "none";
+                }
+                keys.appendChild(div);
+
+                var button = document.createElement("input");
+                button.type = "radio";
+                button.name = "lang";
+                button.value = lang;
+                button.dataset.label = prolang.name;
+                if (first) {
+                    button.checked = true;
+                }
+                button.onclick = function () {
+                    Array.from(keys.children).forEach(c => {
+                        c.style.display = "none";
+                    })
+                    document.getElementsByClassName(this.value)[0].style.display = "block";
+                }
+                buttons.appendChild(button);
+                first = false;
+            });
+		</script>
+	</body>
+</html>
